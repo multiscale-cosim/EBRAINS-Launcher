@@ -18,7 +18,7 @@ import json
 import common
 import configurations_manager
 from default_directories_enum import DefaultDirectories
-from common.launching_manager import LaunchingManager
+from launching_manager import LaunchingManager
 
 class CoSimulator:
     """
