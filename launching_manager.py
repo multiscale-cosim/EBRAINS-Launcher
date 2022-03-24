@@ -15,9 +15,10 @@ import os
 import multiprocessing
 
 # Co-Simulator's imports
-import common
-from python.launcher import Launcher
-from python.Application_Companion.common_enums import Response
+from EBRAINS_ConfigManager.workflow_configuraitons_manager.xml_parsers import constants
+from EBRAINS_ConfigManager.workflow_configuraitons_manager.xml_parsers import enums
+from EBRAINS_RichEndpoint.launcher import Launcher
+from EBRAINS_RichEndpoint.Application_Companion.common_enums import Response
 
 
 class LaunchingManager(object):
@@ -60,15 +61,15 @@ class LaunchingManager(object):
         based on the action-event type.
         '''
         # Case 1: SEQUENTIAL_ACTIONS
-        if action_event == common.constants.CO_SIM_WAIT_FOR_SEQUENTIAL_ACTIONS:
-            return common.constants.CO_SIM_SEQUENTIAL_ACTION
+        if action_event == constants.CO_SIM_WAIT_FOR_SEQUENTIAL_ACTIONS:
+            return constants.CO_SIM_SEQUENTIAL_ACTION
         # Case 2: CONCURRENT_ACTIONS
-        if action_event == common.constants.CO_SIM_WAIT_FOR_CONCURRENT_ACTIONS:
-            return common.constants.CO_SIM_CONCURRENT_ACTION
+        if action_event == constants.CO_SIM_WAIT_FOR_CONCURRENT_ACTIONS:
+            return constants.CO_SIM_CONCURRENT_ACTION
 
         # Otherwise, the <action_event> element contains an erroneous entry
         self.__logger.error(f'wrong <action_event> entry found:{action_event}')
-        return common.enums.LauncherReturnCodes.XML_ERROR
+        return enums.LauncherReturnCodes.XML_ERROR
 
     def __check_actions_grouping(self):
         """
@@ -99,9 +100,9 @@ class LaunchingManager(object):
                 self.__get_expected_action_launch_method(action_event)
             # validate action event launching method type
             if expected_action_launch_method ==\
-                    common.enums.LauncherReturnCodes.XML_ERROR:
+                    enums.LauncherReturnCodes.XML_ERROR:
                 # an error is already logged for wrong action_event entry
-                return common.enums.LauncherReturnCodes.XML_ERROR
+                return enums.LauncherReturnCodes.XML_ERROR
 
             # validate the grouping of actions and their launching method types
             for current_action in actions_list:
@@ -118,10 +119,10 @@ class LaunchingManager(object):
                         f'<{action_xml_id}> method {action_event} '
                         f'expects <{current_action}> having the '
                         f'{expected_action_launch_method} launching method.')
-                    return common.enums.LauncherReturnCodes.ACTIONS_GROUPING_ERROR
+                    return enums.LauncherReturnCodes.ACTIONS_GROUPING_ERROR
 
         # otherwise, action and launching methods grouping is validated
-        return common.enums.LauncherReturnCodes.LAUNCHER_OK
+        return enums.LauncherReturnCodes.LAUNCHER_OK
 
     def __gather_action_xml_filenames(self):
         """
@@ -147,11 +148,11 @@ class LaunchingManager(object):
         except KeyError:
             # XML file name is not found in action_plan_dict
             self.__logger.error('Error in gathering action XML file names.')
-            return common.enums.LauncherReturnCodes.GATHERING_XML_FILENAMES_ERROR
+            return enums.LauncherReturnCodes.GATHERING_XML_FILENAMES_ERROR
 
         # otherwise, XML file names are gatheres from the action plan XML file
         self.__logger.debug('action XML file names are gathered.')
-        return common.enums.LauncherReturnCodes.LAUNCHER_OK
+        return enums.LauncherReturnCodes.LAUNCHER_OK
 
     def __map_out_launching_strategy(self):
         """
@@ -179,7 +180,7 @@ class LaunchingManager(object):
         # will be grouped
         for key, value in self.__action_plan_dict.items():
             # checking again the <action_type> value, just in case...
-            if value['action_type'] == common.constants.CO_SIM_ACTION:
+            if value['action_type'] == constants.CO_SIM_ACTION:
                 # accumulating the actions before finding an event action type
                 actions_list.append(key)
 
@@ -187,7 +188,7 @@ class LaunchingManager(object):
                 # to establish the number of spawner processes
                 # to be created later
                 actions_counter += 1
-            elif value['action_type'] == common.constants.CO_SIM_EVENT:
+            elif value['action_type'] == constants.CO_SIM_EVENT:
                 # an event has been found (meaning, a graph node)
                 # related to actions (task to be spawned),
                 # it must be SEQUENTIAL or CONCURRENT
@@ -199,7 +200,7 @@ class LaunchingManager(object):
             else:
                 self.__logger.error(f"wrong <action_type> found:"
                                     f"{value['action_type']}")
-                return common.enums.LauncherReturnCodes.XML_ERROR
+                return enums.LauncherReturnCodes.XML_ERROR
 
             if actions_counter > self.__maximum_number_actions_found:
                 # keeping the maximum number of actions associated to one event
@@ -213,11 +214,11 @@ class LaunchingManager(object):
         if self.__launching_strategy_dict and actions_list:
             self.__logger.error('<action_plan> must be ended with a'
                                 ' CO_SIM_EVENT element')
-            return common.enums.LauncherReturnCodes.MAPPING_OUT_ERROR
+            return enums.LauncherReturnCodes.MAPPING_OUT_ERROR
 
         # at this point __launching_strategy_dict contains the actions
         # grouped by events
-        return common.enums.LauncherReturnCodes.LAUNCHER_OK
+        return enums.LauncherReturnCodes.LAUNCHER_OK
 
     def __perform_sequential_actions(self, actions_list, event_action_xml_id):
         '''
@@ -243,10 +244,10 @@ class LaunchingManager(object):
                            f'event <{event_action_xml_id}>')
         # start spawner proccesses to perform SEQUENTIAL actions
         if self.__start_spawner_processes() ==\
-                common.enums.LauncherReturnCodes.LAUNCHER_NOT_OK:
+                enums.LauncherReturnCodes.LAUNCHER_NOT_OK:
             # processes could not be started,
             # a more specific error is already logged
-            return common.enums.LauncherReturnCodes.LAUNCHER_NOT_OK
+            return enums.LauncherReturnCodes.LAUNCHER_NOT_OK
 
         # processes are started, now perform SEQUENTIAL actions
         for action_xml_id in actions_list:
@@ -258,12 +259,12 @@ class LaunchingManager(object):
             except KeyError:
                 self.__logger.error(f'There are no Popen args to spawn'
                                     f'<{action_xml_id}>')
-                return common.enums.LauncherReturnCodes.LAUNCHER_NOT_OK
+                return enums.LauncherReturnCodes.LAUNCHER_NOT_OK
 
             # Popen args are found
             try:
                 # sending action to spawner process to perform it
-                self.__actions_to_be_carried_out_jq.put(common.Action(
+                self.__actions_to_be_carried_out_jq.put(Action(
                         event_action_xml_id=event_action_xml_id,
                         action_xml_id=action_xml_id,
                         action_popen_args_list=action_popen_args_list,
@@ -280,13 +281,13 @@ class LaunchingManager(object):
         # All sequential actions have been performed,
         # stop the spawner processes
         if self.__stop_spawner_processes() ==\
-                common.enums.LauncherReturnCodes.LAUNCHER_NOT_OK:
+                enums.LauncherReturnCodes.LAUNCHER_NOT_OK:
             # processes could not be stopped,
             # a more specific error is already logged
-            return common.enums.LauncherReturnCodes.LAUNCHER_NOT_OK
+            return enums.LauncherReturnCodes.LAUNCHER_NOT_OK
 
         # The processes are stopped after performing all SEQUENTIAL actions
-        return common.enums.LauncherReturnCodes.LAUNCHER_OK
+        return enums.LauncherReturnCodes.LAUNCHER_OK
 
     def __perform_concurrent_actions(self, actions_list, event_action_xml_id):
         '''
@@ -322,7 +323,7 @@ class LaunchingManager(object):
             except KeyError:
                 self.__logger.error(f'There are no Popen args to spawn'
                                     f'<{action_xml_id}>')
-                return common.enums.LauncherReturnCodes.LAUNCHER_NOT_OK
+                return enums.LauncherReturnCodes.LAUNCHER_NOT_OK
 
             # actions (Popen args) are found
             self.__logger.debug(f'appending action: {action_popen_args_list}')
@@ -337,16 +338,16 @@ class LaunchingManager(object):
                             f'{concurrent_actions_list}')
         if concurrent_actions_launcher.launch(concurrent_actions_list) ==\
                 Response.OK:
-            return common.enums.LauncherReturnCodes.LAUNCHER_OK
+            return enums.LauncherReturnCodes.LAUNCHER_OK
         else:
-            return common.enums.LauncherReturnCodes.LAUNCHER_NOT_OK
+            return enums.LauncherReturnCodes.LAUNCHER_NOT_OK
 
     def __start_spawner_processes(self):
         """
         helper function to start the spawner processes for performing
         SEQUENTIAL actions.
         """
-        self.__spawners = [common.Spawner(
+        self.__spawners = [Spawner(
                 self.__launching_manager_PID,  # PPID for the Spawner
                 actions_to_be_carried_out=self.__actions_to_be_carried_out_jq,
                 returned_codes=self.__actions_return_codes_q,
@@ -360,10 +361,10 @@ class LaunchingManager(object):
             if current_spawner.start() is not None:
                 self.__logger.error(f'{current_spawner} could not be started')
                 # TODO terminate loudly with error
-                return common.enums.LauncherReturnCodes.LAUNCHER_NOT_OK
+                return enums.LauncherReturnCodes.LAUNCHER_NOT_OK
 
         # spawner processes are started
-        return common.enums.LauncherReturnCodes.LAUNCHER_OK
+        return enums.LauncherReturnCodes.LAUNCHER_OK
 
     def __stop_spawner_processes(self):
         """
@@ -383,10 +384,10 @@ class LaunchingManager(object):
             # TODO handle with signal manager
             self.__logger.info("Caught KeyboardInterrupt! Setting stop event")
             self.__stopping_event.set()
-            return common.enums.LauncherReturnCodes.LAUNCHER_NOT_OK
+            return enums.LauncherReturnCodes.LAUNCHER_NOT_OK
 
         # all spawner processes have taken their pill
-        return common.enums.LauncherReturnCodes.LAUNCHER_OK
+        return enums.LauncherReturnCodes.LAUNCHER_OK
 
     def __perform_spawning_strategy(self):
         """
@@ -399,10 +400,10 @@ class LaunchingManager(object):
         # switcher to invoke relevant function to perform specific action types
         action_execution_choices = {
                     # case 1
-                    common.constants.CO_SIM_WAIT_FOR_SEQUENTIAL_ACTIONS:\
+                    constants.CO_SIM_WAIT_FOR_SEQUENTIAL_ACTIONS:\
                     self.__perform_sequential_actions,
                     # case 2
-                    common.constants.CO_SIM_WAIT_FOR_CONCURRENT_ACTIONS:\
+                    constants.CO_SIM_WAIT_FOR_CONCURRENT_ACTIONS:\
                     self.__perform_concurrent_actions}
 
         # retrieve the actions from launching_strategy_dict to perform them
@@ -417,13 +418,13 @@ class LaunchingManager(object):
             if not action_execution_choices[action_event](
                                                     actions_list,
                                                     event_action_xml_id) ==\
-                    common.enums.LauncherReturnCodes.LAUNCHER_OK:
+                    enums.LauncherReturnCodes.LAUNCHER_OK:
                 # something went wrong while performing actions,
                 # more specific errors are already logged
-                return common.enums.LauncherReturnCodes.LAUNCHER_NOT_OK
+                return enums.LauncherReturnCodes.LAUNCHER_NOT_OK
 
         # otherwise, all actions are performed successfully
-        return common.enums.LauncherReturnCodes.LAUNCHER_OK
+        return enums.LauncherReturnCodes.LAUNCHER_OK
 
     def carry_out_action_plan(self):
         """
@@ -444,52 +445,52 @@ class LaunchingManager(object):
         # STEP 1 - Grouping actions by events
         ########
         if not self.__map_out_launching_strategy() ==\
-                common.enums.LauncherReturnCodes.LAUNCHER_OK:
+                enums.LauncherReturnCodes.LAUNCHER_OK:
             self.__logger.debug('something went wrong by mapping out the'
                                 ' action-plan')
-            return common.enums.LauncherReturnCodes.MAPPING_OUT_ERROR
+            return enums.LauncherReturnCodes.MAPPING_OUT_ERROR
 
         ########
         # STEP 2 - Checking the actions grouping, i.e. SEQUENTIAL or CONCURRENT
         ########
         if not self.__check_actions_grouping() ==\
-                common.enums.LauncherReturnCodes.LAUNCHER_OK:
+                enums.LauncherReturnCodes.LAUNCHER_OK:
             self.__logger.debug('an action inconsistently associated to a'
                                 ' waiting event was found')
-            return common.enums.LauncherReturnCodes.ACTIONS_GROUPING_ERROR
+            return enums.LauncherReturnCodes.ACTIONS_GROUPING_ERROR
 
         ########
         # STEP 3 - Gathering the XML filenames from the <action_xml> element of
         # each action
         ########
         if not self.__gather_action_xml_filenames() ==\
-                common.enums.LauncherReturnCodes.LAUNCHER_OK:
+                enums.LauncherReturnCodes.LAUNCHER_OK:
             self.__logger.debug('error by gathering XML filenames from the'
                                 ' action plan')
-            return common.enums.LauncherReturnCodes.GATHERING_XML_FILENAMES_ERROR
+            return enums.LauncherReturnCodes.GATHERING_XML_FILENAMES_ERROR
 
         ########
         # STEP 4 - Carrying out the action plan, based on events and their
         # associated actions
         ########
         if not self.__perform_spawning_strategy() ==\
-                common.enums.LauncherReturnCodes.LAUNCHER_OK:
+                enums.LauncherReturnCodes.LAUNCHER_OK:
             self.__logger.debug('something went wrong by executing the '
                                 'action-plan')
-            return common.enums.LauncherReturnCodes.PERFORMING_STRATEGY_ERROR
+            return enums.LauncherReturnCodes.PERFORMING_STRATEGY_ERROR
 
         # Check if all actions are performed without error
         there_was_an_error = False
         while not self.__actions_return_codes_q.empty():
             current_action_result = self.__actions_return_codes_q.get()
-            if current_action_result == common.enums.ActionReturnCodes.OK:
+            if current_action_result == enums.ActionReturnCodes.OK:
                 continue
             else:
                 there_was_an_error = True
                 break
         # some actions finsishes with error
         if there_was_an_error:
-            return common.enums.LauncherReturnCodes.ACTIONS_FINISHED_WITH_ERROR
+            return enums.LauncherReturnCodes.ACTIONS_FINISHED_WITH_ERROR
 
         # no errors! (all actions returned Popen rc=0)
-        return common.enums.LauncherReturnCodes.LAUNCHER_OK
+        return enums.LauncherReturnCodes.LAUNCHER_OK
