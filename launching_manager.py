@@ -13,6 +13,8 @@
 # ------------------------------------------------------------------------------
 import os
 import multiprocessing
+import pickle
+import base64
 
 # Co-Simulator's imports
 from EBRAINS_ConfigManager.workflow_configuraitons_manager.xml_parsers import constants
@@ -320,6 +322,16 @@ class LaunchingManager(object):
                 # get action (Popen args) to be performed
                 action_popen_args_list =\
                      self.__actions_popen_args_dict[action_xml_id]
+
+                # append configurations_manager and log_settings to Inject
+                # Dependencies to have unifromn log settings and centralized
+                # location for output directories
+                action_popen_args_list.append(
+                    base64.b64encode(
+                        pickle.dumps(self._configurations_manager)))
+                action_popen_args_list.append(
+                    base64.b64encode(
+                        pickle.dumps(self._logger_settings)))
             except KeyError:
                 self.__logger.error(f'There are no Popen args to spawn'
                                     f'<{action_xml_id}>')
