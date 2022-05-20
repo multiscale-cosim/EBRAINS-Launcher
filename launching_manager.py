@@ -32,7 +32,7 @@ class LaunchingManager(object):
     """
 
     def __init__(self, action_plan_dict, actions_popen_args_dict,
-                 log_settings, configurations_manager):
+                 log_settings, configurations_manager, actions_sci_params_dict):
         # initialize logger with uniform settings
         self._logger_settings = log_settings
         self._configurations_manager = configurations_manager
@@ -43,6 +43,8 @@ class LaunchingManager(object):
         self.__action_plan_dict = action_plan_dict
         # Popen arguments keyed by action XML IDs
         self.__actions_popen_args_dict = actions_popen_args_dict
+        # Dictionary containing the XML PATH+FILENAME of Scientific Parameters by Action ID
+        self.__actions_sci_params_dict = actions_sci_params_dict
         # XML filenames from <action_xml> element of the action plan XML file
         self.__actions_xml_filenames_dict = {}
         # Mapped action plan, actions grouped by events
@@ -244,7 +246,7 @@ class LaunchingManager(object):
         '''
         self.__logger.info(f'Sequentially processing of actions owned by the '
                            f'event <{event_action_xml_id}>')
-        # start spawner proccesses to perform SEQUENTIAL actions
+        # start spawner processes to perform SEQUENTIAL actions
         if self.__start_spawner_processes() ==\
                 enums.LauncherReturnCodes.LAUNCHER_NOT_OK:
             # processes could not be started,
@@ -324,7 +326,7 @@ class LaunchingManager(object):
                      self.__actions_popen_args_dict[action_xml_id]
 
                 # append configurations_manager and log_settings to Inject
-                # Dependencies to have unifromn log settings and centralized
+                # Dependencies to have uniform log settings and centralized
                 # location for output directories
                 action_popen_args_list.append(
                     base64.b64encode(
@@ -332,6 +334,7 @@ class LaunchingManager(object):
                 action_popen_args_list.append(
                     base64.b64encode(
                         pickle.dumps(self._logger_settings)))
+                action_popen_args_list.append(self.__actions_sci_params_dict[action_xml_id])
             except KeyError:
                 self.__logger.error(f'There are no Popen args to spawn'
                                     f'<{action_xml_id}>')
