@@ -32,7 +32,7 @@ class LaunchingManager(object):
     """
 
     def __init__(self, action_plan_dict, actions_popen_args_dict,
-                 log_settings, configurations_manager, actions_sci_params_dict):
+                 log_settings, configurations_manager, actions_sci_params_dict, communication_settings_dict=None):
         # initialize logger with uniform settings
         self._logger_settings = log_settings
         self._configurations_manager = configurations_manager
@@ -47,6 +47,9 @@ class LaunchingManager(object):
         self.__actions_sci_params_dict = actions_sci_params_dict
         # XML filenames from <action_xml> element of the action plan XML file
         self.__actions_xml_filenames_dict = {}
+        # Dictionary containing the communication settings to be used by ZMQ or another communication framework/library
+        # e.g. default port, ports range, communication pattern, pace, delay, resilience approach, etc.
+        self.__communication_settings_dict = communication_settings_dict
         # Mapped action plan, actions grouped by events
         self.__launching_strategy_dict = {}
         # the number of spawner to be started
@@ -347,7 +350,9 @@ class LaunchingManager(object):
 
         # initialize launcher to perform concurrent actions
         concurrent_actions_launcher =\
-            Launcher(self._logger_settings, self._configurations_manager)
+            Launcher(self._logger_settings, self._configurations_manager,
+                     proxy_manager_server_address=None,  # Using default values
+                     communication_settings_dict=self.__communication_settings_dict)
         # perform concurrent actions
         self.__logger.debug(f'performing CONCURRENT actions: '
                             f'{concurrent_actions_list}')
