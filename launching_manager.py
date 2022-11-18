@@ -17,8 +17,8 @@ import pickle
 import base64
 
 # Co-Simulator's imports
-from EBRAINS_ConfigManager.workflow_configuraitons_manager.xml_parsers import constants
-from EBRAINS_ConfigManager.workflow_configuraitons_manager.xml_parsers import enums
+from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import constants
+from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import enums
 from EBRAINS_RichEndpoint.launcher import Launcher
 from EBRAINS_RichEndpoint.Application_Companion.common_enums import Response
 
