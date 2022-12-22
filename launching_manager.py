@@ -20,6 +20,7 @@ import base64
 from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import constants
 from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import enums
 from EBRAINS_RichEndpoint.launcher import Launcher
+from EBRAINS_RichEndpoint.launcher_hpc import LauncherHPC
 from EBRAINS_RichEndpoint.Application_Companion.common_enums import Response
 
 
@@ -350,7 +351,7 @@ class LaunchingManager(object):
 
         # initialize launcher to perform concurrent actions
         concurrent_actions_launcher =\
-            Launcher(self._logger_settings, self._configurations_manager,
+            LauncherHPC(self._logger_settings, self._configurations_manager,
                      proxy_manager_server_address=None,  # Using default values
                      communication_settings_dict=self.__communication_settings_dict)
         # perform concurrent actions
