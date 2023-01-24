@@ -41,7 +41,8 @@ class LaunchingManager(object):
                  log_settings,
                  configurations_manager,
                  actions_sci_params_dict,
-                 communication_settings_dict=None):
+                 communication_settings_dict=None,
+                 services_deployment_dict=None):
         # initialize logger with uniform settings
         self._logger_settings = log_settings
         self._configurations_manager = configurations_manager
@@ -63,6 +64,10 @@ class LaunchingManager(object):
         # Dictionary containing the communication settings to be used by ZMQ or another communication framework/library
         # e.g. default port, ports range, communication pattern, pace, delay, resilience approach, etc.
         self.__communication_settings_dict = communication_settings_dict
+        #
+        # Co-Sim nodes arrangement for deploying
+        self.__services_deployment_dict = services_deployment_dict
+        #
         # Mapped action plan, actions grouped by events
         self.__launching_strategy_dict = {}
         # the number of spawner to be started
@@ -371,7 +376,8 @@ class LaunchingManager(object):
                         self._configurations_manager,
                         proxy_manager_server_address=None,  # Using default values
                         communication_settings_dict=self.__communication_settings_dict,
-                        is_execution_environment_hpc=self.__is_execution_environment_hpc)
+                        is_execution_environment_hpc=self.__is_execution_environment_hpc,
+                        services_deployment_dict=self.__services_deployment_dict)
         # perform concurrent actions
         self.__logger.debug(f'performing CONCURRENT actions: '
                             f'{concurrent_actions_list}')
