@@ -22,7 +22,7 @@ from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import en
 from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers.variables import CO_SIM_EXECUTION_ENVIRONMENT
 from EBRAINS_RichEndpoint.launcher import Launcher
 from EBRAINS_RichEndpoint.launcher_hpc import LauncherHPC
-from EBRAINS_RichEndpoint.Application_Companion.common_enums import Response
+from EBRAINS_RichEndpoint.application_companion.common_enums import Response
 
 
 class LaunchingManager(object):
