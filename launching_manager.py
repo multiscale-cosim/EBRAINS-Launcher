@@ -315,6 +315,10 @@ class LaunchingManager(object):
         # The processes are stopped after performing all SEQUENTIAL actions
         return enums.LauncherReturnCodes.LAUNCHER_OK
 
+    def __action_identifiers(self):
+        goal = self.__action_plan_dict[action_xml_id]['action_goal']
+        label = self.__action_plan_dict[action_xml_id]['action_label']
+
     def __perform_concurrent_actions(self, actions_list, event_action_xml_id):
         '''
         helper function for performing the CONCURRENT actions
@@ -343,6 +347,10 @@ class LaunchingManager(object):
         for action_xml_id in actions_list:
             action_popen_args_list = []
             try:
+                # get action specific identifiers such as goal, label etc.
+                goal = self.__action_plan_dict[action_xml_id]['action_goal']
+                label = self.__action_plan_dict[action_xml_id]['action_label']
+
                 # get action (Popen args) to be performed
                 action_popen_args_list = \
                     self.__actions_popen_args_dict[action_xml_id]
@@ -365,7 +373,10 @@ class LaunchingManager(object):
             # actions (Popen args) are found
             self.__logger.debug(f'appending action: {action_popen_args_list}')
             concurrent_actions_list.append(
-                {'action': action_popen_args_list, 'action-id': action_xml_id})
+                {'action': action_popen_args_list,
+                 'action-id': action_xml_id,
+                 'action-goal': goal,
+                 'action-label':label})
 
         # initialize launcher to perform concurrent actions
         if self.__action_plan_variables_dict[CO_SIM_EXECUTION_ENVIRONMENT].upper() != "LOCAL":
