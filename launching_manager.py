@@ -41,8 +41,10 @@ class LaunchingManager(object):
                  log_settings,
                  configurations_manager,
                  actions_sci_params_dict,
+                 is_interactive,
+                 is_monitoring_enabled,
                  communication_settings_dict=None,
-                 services_deployment_dict=None):
+                 services_deployment_dict=None,):
         # initialize logger with uniform settings
         self._logger_settings = log_settings
         self._configurations_manager = configurations_manager
@@ -79,6 +81,10 @@ class LaunchingManager(object):
         self.__launching_manager_PID = os.getpid()
         self.__stopping_event = multiprocessing.Event()
         self.__is_execution_environment_hpc = False  # by default the running environment is considered "Local"
+        # flag whether the steering is interactive
+        self.__is_interactive =  is_interactive
+        # flag to determine whether resource usage monitroing is enabled
+        self.__is_monitoring_enabled = is_monitoring_enabled
         self.__logger.debug('Launching Manager is initialized.')
 
     def __get_expected_action_launch_method(self, action_event):
@@ -388,7 +394,9 @@ class LaunchingManager(object):
                         proxy_manager_server_address=None,  # Using default values
                         communication_settings_dict=self.__communication_settings_dict,
                         is_execution_environment_hpc=self.__is_execution_environment_hpc,
-                        services_deployment_dict=self.__services_deployment_dict)
+                        services_deployment_dict=self.__services_deployment_dict,
+                        is_interactive=self.__is_interactive,
+                        is_monitoring_enabled=self.__is_monitoring_enabled)
         # perform concurrent actions
         self.__logger.debug(f'performing CONCURRENT actions: '
                             f'{concurrent_actions_list}')
