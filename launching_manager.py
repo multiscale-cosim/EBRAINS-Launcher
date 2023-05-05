@@ -17,6 +17,8 @@ import pickle
 import base64
 
 # Co-Simulator's imports
+from common.utils.common_utils import strtobool
+
 from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import constants
 from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import enums
 from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers.variables import CO_SIM_EXECUTION_ENVIRONMENT
@@ -42,7 +44,6 @@ class LaunchingManager(object):
                  configurations_manager,
                  actions_sci_params_dict,
                  is_interactive,
-                 is_monitoring_enabled,
                  communication_settings_dict=None,
                  services_deployment_dict=None,):
         # initialize logger with uniform settings
@@ -83,8 +84,20 @@ class LaunchingManager(object):
         self.__is_execution_environment_hpc = False  # by default the running environment is considered "Local"
         # flag whether the steering is interactive
         self.__is_interactive =  is_interactive
-        # flag to determine whether resource usage monitroing is enabled
-        self.__is_monitoring_enabled = is_monitoring_enabled
+
+        # set the defulat settings for resource usage monitoring
+        self.__is_monitoring_enabled = False
+        # overwirte the default settings from XML configurations
+        try:
+            self.__is_monitoring_enabled = strtobool(self.__action_plan_parameters_dict.get("CO_SIM_ENABLE_MONITORING"))
+        except Exception as e:
+            # This could happen when the value is not set in XML file properly
+            # Now, fall back to default settings
+            self.__logger.critical("resource usage monitoring settings could not be set from XML")
+            self.__logger.exception(f"got the exception: {e}")
+            self.__logger.critical("falling back to default settings")
+            
+        self.__logger.info(f"monitor resource usage: {self.__is_monitoring_enabled}")
         self.__logger.debug('Launching Manager is initialized.')
 
     def __get_expected_action_launch_method(self, action_event):
@@ -504,7 +517,6 @@ class LaunchingManager(object):
 
             PERFORMING_STRATEGY_ERROR: Some action ended with error
         """
-
         ########
         # STEP 1 - Grouping actions by events
         ########
