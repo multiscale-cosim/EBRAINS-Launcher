@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-#  Copyright 2020 Forschungszentrum Jülich GmbH and Aix-Marseille Université
+#  Copyright 2020-2023 Forschungszentrum Jülich GmbH and Aix-Marseille Université
 # "Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements; and to You under the Apache License,
 # Version 2.0. "
@@ -13,10 +13,10 @@
 
 
 from flask import Flask, jsonify, json, request
-# from flask_cors import CORS, cross_origin
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-# CORS(app)
+CORS(app)
 
 VERSION = 0.1
 
@@ -27,7 +27,6 @@ def index():
     })
 
 @app.route("/write", methods=["POST"])
-# @cross_origin()
 def write():
     """ Write python script to file. """
     data = request.get_json()
