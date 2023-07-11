@@ -15,7 +15,7 @@ import os
 import json
 
 # Co-Simulator imports
-from common import args
+from EBRAINS_Launcher.common import args
 from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import enums
 from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import variables
 from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import comm_settings_xml_manager

@@ -17,7 +17,7 @@ import pickle
 import base64
 
 # Co-Simulator's imports
-from common.utils.common_utils import strtobool
+from EBRAINS_Launcher.common.utils.common_utils import strtobool
 
 from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import constants
 from EBRAINS_ConfigManager.workflow_configurations_manager.xml_parsers import enums
