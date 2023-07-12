@@ -3,8 +3,8 @@ import requests
 url = "http://localhost:5000"
 print(requests.get(url).json())
 
-def cs_write(script):
+def submit(script):
     return requests.post(url + "/submit", json={"script":script})
 
-cs_write("Hello world!")
-cs_write("import nest\n\nnest.ResetKernel()")
+submit("Hello world!")
+submit("import nest\n\nnest.ResetKernel()")
