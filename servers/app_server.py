@@ -20,7 +20,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-VERSION = 0.1
+VERSION = 2.0
 SCRIPT_DIRPATH="${COSIM_SCRIPT_DIRPATH:-${PWD}}" # TODO Use absolute dir path where files can be stored.
 
 @app.route("/", methods=["GET"])
