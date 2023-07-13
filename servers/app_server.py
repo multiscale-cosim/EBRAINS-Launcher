@@ -16,11 +16,12 @@ from flask import Flask, jsonify, json, request
 from flask_cors import CORS
 
 import os
+import sys
 
 app = Flask(__name__)
 CORS(app)
 
-VERSION = 2.0
+VERSION = 0.1
 SCRIPT_DIRPATH="${COSIM_SCRIPT_DIRPATH:-${PWD}}" # TODO Use absolute dir path where files can be stored.
 
 @app.route("/", methods=["GET"])
@@ -40,7 +41,9 @@ def submit():
         f.write(script)
 
     # Start simulation
-
+    # NOTE sending start simmulation signal via PIPE
+    # TODO instead of reading/writing through PIPE, communciate via 0MQ
+    print("start simulation!")
     return json.dumps(True)
 
 @app.route("/stop", methods=["GET"])
@@ -51,4 +54,7 @@ def stop():
     return json.dumps(True)
 
 if __name__ == "__main__":
-    app.run()
+    host = sys.argv[1]
+    port = sys.argv[2]
+    print(f"app server host: {host}, port: {port}")
+    app.run(host=host, port=port)
