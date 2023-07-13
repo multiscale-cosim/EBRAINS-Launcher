@@ -22,7 +22,7 @@ app = Flask(__name__)
 CORS(app)
 
 VERSION = 0.1
-SCRIPT_DIRPATH="${COSIM_SCRIPT_DIRPATH:-${PWD}}" # TODO Use absolute dir path where files can be stored.
+SCRIPT_DIRPATH="/home/vagrant/multiscale-cosim/my_forks/Cosim_NestDesktop_Insite/userland/models/nest_simulator" # TODO Use absolute dir path where files can be stored.
 
 @app.route("/", methods=["GET"])
 def index():
@@ -35,7 +35,7 @@ def submit():
     """ Write script to file and the start launcher. """
     data = request.get_json()
 
-    filename = data.get("filename", os.path.join(SCRIPT_DIRPATH, "script.py"))
+    filename = data.get("filename", os.path.join(SCRIPT_DIRPATH, "nd_spike_activity_test.py"))
     script = data.get("script", "")
     with open(filename, "w") as f:
         f.write(script)
@@ -57,4 +57,4 @@ if __name__ == "__main__":
     host = sys.argv[1]
     port = sys.argv[2]
     print(f"app server host: {host}, port: {port}")
-    app.run(host=host, port=port)
+    app.run(host="0.0.0.0", port=port)
