@@ -20,15 +20,25 @@ import sys
 
 app = Flask(__name__)
 CORS(app)
+health_registry_manager_proxy = None
 
 VERSION = 0.1
-SCRIPT_DIRPATH="/home/vagrant/multiscale-cosim/my_forks/Cosim_NestDesktop_Insite/userland/models/nest_simulator" # TODO Use absolute dir path where files can be stored.
+# TODO Use absolute dir path where files can be stored.
+SCRIPT_DIRPATH="/home/vagrant/multiscale-cosim/Cosim_NestDesktop_Insite/userland/models/nest_simulator"
+
 
 @app.route("/", methods=["GET"])
 def index():
     return jsonify({
         "CoSimServer": VERSION,
     })
+
+
+@app.route("/global_state", methods=["GET"])
+def global_state():
+    # get current global state from orchestrator
+    return "In progress..."
+
 
 @app.route("/submit", methods=["POST"])
 def submit():
@@ -43,8 +53,9 @@ def submit():
     # Start simulation
     # NOTE sending start simmulation signal via PIPE
     # TODO instead of reading/writing through PIPE, communciate via 0MQ
-    print("start simulation!")
+    print("start simulation!", flush=True)
     return json.dumps(True)
+
 
 @app.route("/stop", methods=["GET"])
 def stop():
@@ -53,8 +64,17 @@ def stop():
 
     return json.dumps(True)
 
+
 if __name__ == "__main__":
+    # TODO better arg parsing
+
+    # NOTE The order of parameters is important
     host = sys.argv[1]
     port = sys.argv[2]
-    print(f"app server host: {host}, port: {port}")
-    app.run(host="0.0.0.0", port=port)
+
+    # More parameters (such as network address) can be received to setup a
+    # channel with Orchestrator for fetching the state information or to
+    # receive the monitoring metrics from resource usage monitors
+
+    # start the app server
+    app.run(host=host, port=port)

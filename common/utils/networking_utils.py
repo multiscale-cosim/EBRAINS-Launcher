@@ -33,7 +33,11 @@ default_range_of_ports = {
                           # range of ports for Application Managers
                           'APPLICATION_MANAGER': {'MIN': 59201,
                                                   'MAX': 59300,
-                                                  'MAX_TRIES': 100}
+                                                  'MAX_TRIES': 100},
+                        # range of ports for App Server
+                          'APPLICATION_MANAGER': {'MIN': 52428,
+                                                  'MAX': 52428,
+                                                  'MAX_TRIES': 1}
                           }
 
 
