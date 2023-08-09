@@ -43,4 +43,6 @@ def safe_makedir(target_directory):
             # target directory, or there is some different error.
             # Just re-raise the error for now.
             raise e
+
         return target_directory
+

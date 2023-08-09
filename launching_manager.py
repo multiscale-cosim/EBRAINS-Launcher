@@ -93,13 +93,39 @@ class LaunchingManager(object):
         except Exception as e:
             # This could happen when the value is not set in XML file properly
             # Now, fall back to default settings
-            self.__logger.critical("resource usage monitoring settings could not be set from XML")
-            self.__logger.exception(f"got the exception: {e}")
+            self.__log_exception(
+                exception=e,
+                message="resource usage monitoring settings could not be set from XML")
+            # self.__logger.critical("resource usage monitoring settings could not be set from XML")
+            # self.__logger.exception(f"got the exception: {e}")
             self.__logger.critical("falling back to default settings")
-            
-        self.__logger.info(f"monitor resource usage: {self.__is_monitoring_enabled}")
+
+        self.__logger.debug("is resource usage monitoring enabled: "
+                            f"{self.__is_monitoring_enabled}")
+
+        # set the defulat settings for REST service
+        self.__is_app_server_enabled = False
+        # overwirte the default settings from XML configurations
+        try:
+            self.__is_app_server_enabled = strtobool(self.__action_plan_parameters_dict.get("CO_SIM_ENABLE_REST_APP_SERVER"))
+        except Exception as e:
+            # This could happen when the value is not set in XML file properly
+            # Now, fall back to default settings
+            self.__log_exception(
+                exception=e,
+                message="App Server en/disable settings could not be set from XML")
+            self.__logger.critical("falling back to default settings")
+
+        self.__logger.debug("is app server enabled: "
+                            f"{self.__is_app_server_enabled}")
+
         self.__logger.debug('Launching Manager is initialized.')
 
+    def __log_exception(self, exception, message):
+        """logs the custom message and the exception with traceback"""
+        self.__logger.critical(message)
+        self.__logger.exception(f"got the exception: {exception}")
+    
     def __get_expected_action_launch_method(self, action_event):
         """
         helper function which returns the relative launching method
@@ -409,7 +435,8 @@ class LaunchingManager(object):
                         is_execution_environment_hpc=self.__is_execution_environment_hpc,
                         services_deployment_dict=self.__services_deployment_dict,
                         is_interactive=self.__is_interactive,
-                        is_monitoring_enabled=self.__is_monitoring_enabled)
+                        is_monitoring_enabled=self.__is_monitoring_enabled,
+                        is_app_server_enabled=self.__is_app_server_enabled)
         # perform concurrent actions
         self.__logger.debug(f'performing CONCURRENT actions: '
                             f'{concurrent_actions_list}')
